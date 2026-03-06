@@ -7,13 +7,12 @@ const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 async function getMovie(id) {
-  const res = await fetch(`${BASE_URL}/api/movie/${id}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(`https://www.omdbapi.com/?i=${id}&apikey=${process.env.OMDB_API_KEY}`);
 
   const data = await res.json();
+  console.log("API RESPONSE:", data);
 
-  if (!res.ok) {
+  if (!res.ok || data.Response === "False") {
     console.log("API ERROR:", data);
     throw new Error("Failed to fetch movie");
   }
@@ -57,12 +56,12 @@ async function generateSummary(plot) {
 }
 
 export default async function MoviePage({ params }) {
-
-  const { id } = params;
+  const { id } = await params;
 
   if (!id) {
     return <p>Invalid movie ID.</p>;
   }
+
 
   const movie = await getMovie(id);
 
